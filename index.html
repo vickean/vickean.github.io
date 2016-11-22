@@ -48,6 +48,9 @@
     var clickX = 0;
     var clickY = 0;
 
+    var touchX = 0;
+    var touchY = 0;
+
     var x = canvas.width/2;
     var y = canvas.height-30;
     var ballSpeed = 5;
@@ -273,7 +276,7 @@
     }
 
     function inLeftButton(){
-      if(clickX > leftButton.x && clickX < leftButton.x + leftButton.width && clickY > leftButton.y && clickY < leftButton.y + leftButton.height){
+      if(touchX > leftButton.x && touchX < leftButton.x + leftButton.width && touchY > leftButton.y && touchY < leftButton.y + leftButton.height){
         return true;
       } else {
         return false;
@@ -281,7 +284,7 @@
     }
 
     function inRightButton(){
-      if(clickX > rightButton.x && clickX < rightButton.x + rightButton.width && clickY > rightButton.y && clickY < rightButton.y + rightButton.height){
+      if(touchX > rightButton.x && touchX < rightButton.x + rightButton.width && touchY > rightButton.y && touchY < rightButton.y + rightButton.height){
         return true;
       } else {
         return false;
@@ -289,7 +292,7 @@
     }
 
     function inPauseButton(){
-      if(clickX > pauseButton.x && clickX < pauseButton.x + pauseButton.width && clickY > pauseButton.y && clickY < pauseButton.y + pauseButton.height){
+      if(touchX > pauseButton.x && touchX < pauseButton.x + pauseButton.width && touchY > pauseButton.y && touchY < pauseButton.y + pauseButton.height){
         return true;
       } else {
         return false;
@@ -324,8 +327,6 @@
         dy = dyLast;
         paused = false;
         pausePressed = false;
-        clickX = 0;
-        clickY = 0;
       } else if(pausePressed){
         paused = true;
         dxLast = dx;
@@ -333,8 +334,6 @@
         dx = 0;
         dy = 0;
         pausePressed = false;
-        clickX = 0;
-        clickY = 0;
       }
 
       x += dx;
@@ -431,6 +430,22 @@
 
       clickX = e.pageX - offsetX;
       clickY = e.pageY - offsetY;
+    }
+
+    canvas2.addEventListener('touchstart', touchStartHandler, false)
+    canvas2.addEventListener('touchend', touchEndHandler, false)
+
+    function touchStartHandler(e) {
+      var touchobj = e.changedTouches[0];
+      touchX = parseInt(touchobj.clientX);
+      touchY = parseInt(touchobj.clientY);
+      e.preventDefault();
+    }
+
+    function touchEndHandler(e) {
+      touchX = 0;
+      touchY = 0;
+      e.preventDefault();
     }
 
     draw();
