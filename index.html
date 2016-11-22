@@ -263,7 +263,7 @@
       cty.fillText("PAUSE", pauseButton.x + 20, pauseButton.y + 65);
     }
 
-    function clickButton(){
+    function touchButton(){
       if(inLeftButton()){
         leftPressed = true;
       }
@@ -278,6 +278,7 @@
     function inLeftButton(){
       if(touchX > leftButton.x && touchX < leftButton.x + leftButton.width && touchY > leftButton.y && touchY < leftButton.y + leftButton.height){
         return true;
+        console.log("left!");
       } else {
         return false;
       }
@@ -310,7 +311,7 @@
       drawScore();
       drawLives();
       drawButtons();
-      clickButton();
+      touchButton();
 
       if(paused == true){
         drawPaused();
@@ -363,21 +364,14 @@
           y = canvas.height-30;
           dx = ballSpeed;
           dy = -ballSpeed;
-          paddleX = (canvas.width-paddleWidth)/2
         }
       }
 
       if(rightPressed && paddleX < canvas.width - paddleWidth) {
         paddleX += 8;
-        clickX = 0;
-        clickY = 0;
-        rightPressed = false;
       }
       else if(leftPressed && paddleX > 0) {
         paddleX -= 8;
-        clickX = 0;
-        clickY = 0;
-        leftPressed = false;
       }
 
       requestAnimationFrame(draw);
@@ -415,36 +409,23 @@
       }
     }
 
-    canvas2.addEventListener("click", onClick, false);
-
-    function onClick(e) {
-      var element = canvas2;
-      var offsetX = 0, offsetY = 0;
-
-      if(element.offsetParent){
-        do{
-          offsetX += element.offsetLeft;
-          offsetY += element.offsetTop;
-        } while ((element = element.offsetParent));
-      }
-
-      clickX = e.pageX - offsetX;
-      clickY = e.pageY - offsetY;
-    }
-
     canvas2.addEventListener('touchstart', touchStartHandler, false)
     canvas2.addEventListener('touchend', touchEndHandler, false)
 
     function touchStartHandler(e) {
+      var rect = canvas2.getBoundingClientRect();
       var touchobj = e.changedTouches[0];
-      touchX = parseInt(touchobj.clientX);
-      touchY = parseInt(touchobj.clientY);
+      touchX = parseInt(touchobj.clientX) - rect.left;
+      touchY = parseInt(touchobj.clientY) - rect.top;
       e.preventDefault();
     }
 
     function touchEndHandler(e) {
       touchX = 0;
       touchY = 0;
+      rightPressed = false;
+      leftPressed = false;
+      pausePressed = false;
       e.preventDefault();
     }
 
