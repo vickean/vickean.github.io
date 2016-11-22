@@ -5,8 +5,12 @@
   <title>Gamedev Canvas Workshop</title>
   <style>
     * { padding: 0; margin: 0; }
-    canvas {
+    #myCanvas {
       background: #eee;
+      display: block;
+      margin: 0 auto;
+    }
+    #canvas2 {
       display: block;
       margin: 0 auto;
     }
@@ -26,11 +30,22 @@
   </p>
   <br />
   <canvas id="myCanvas" width="480" height="320"></canvas>
+  <canvas id="canvas2" width="600" height="150"></canvas>
 
   <script>
     // Javascript goes here
     var canvas = document.getElementById("myCanvas");
     var ctx = canvas.getContext("2d");
+
+    var canvas2 = document.getElementById("canvas2");
+    var cty = canvas2.getContext("2d");
+
+    var leftButton = {x:canvas2.width/2-250,y:canvas2.height/2 - 50,width:150,height:100};
+    var rightButton = {x:canvas2.width/2+100,y:canvas2.height/2 - 50,width:150,height:100};
+    var pauseButton = {x:canvas2.width/2-70,y:canvas2.height/2 - 50,width:140,height:100};
+
+    var clickX = 0;
+    var clickY = 0;
 
     var x = canvas.width/2;
     var y = canvas.height-30;
@@ -212,6 +227,74 @@
       ctx.fillText("Paused", canvas.width/2 - 180, canvas.height/2);
     }
 
+    function drawButtons() {
+      cty.beginPath();
+      cty.rect(leftButton.x, leftButton.y, leftButton.width, leftButton.height);
+      cty.fillStyle = "gray";
+      cty.fill();
+      cty.closePath();
+
+      cty.font = "40px Verdana";
+      cty.fillStyle = "blue";
+      cty.fillText("LEFT", leftButton.x + 25, leftButton.y + 65);
+
+      cty.beginPath();
+      cty.rect(rightButton.x, rightButton.y, rightButton.width, rightButton.height);
+      cty.fillStyle = "gray";
+      cty.fill();
+      cty.closePath();
+
+      cty.font = "40px Verdana";
+      cty.fillStyle = "blue";
+      cty.fillText("RIGHT", rightButton.x + 10, rightButton.y + 65);
+
+      cty.beginPath();
+      cty.rect(pauseButton.x, pauseButton.y, pauseButton.width, pauseButton.height);
+      cty.fillStyle = "gray";
+      cty.fill();
+      cty.closePath();
+
+      cty.font = "30px Verdana";
+      cty.fillStyle = "blue";
+      cty.fillText("PAUSE", pauseButton.x + 20, pauseButton.y + 65);
+    }
+
+    function clickButton(){
+      if(inLeftButton()){
+        leftPressed = true;
+      }
+      if(inRightButton()){
+        rightPressed = true;
+      }
+      if(inPauseButton()){
+        pausePressed = true;
+      }
+    }
+
+    function inLeftButton(){
+      if(clickX > leftButton.x && clickX < leftButton.x + leftButton.width && clickY > leftButton.y && clickY < leftButton.y + leftButton.height){
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    function inRightButton(){
+      if(clickX > rightButton.x && clickX < rightButton.x + rightButton.width && clickY > rightButton.y && clickY < rightButton.y + rightButton.height){
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    function inPauseButton(){
+      if(clickX > pauseButton.x && clickX < pauseButton.x + pauseButton.width && clickY > pauseButton.y && clickY < pauseButton.y + pauseButton.height){
+        return true;
+      } else {
+        return false;
+      }
+    }
+
     function draw() {
       // drawing code
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -222,6 +305,8 @@
       drawCounter();
       drawScore();
       drawLives();
+      drawButtons();
+      clickButton();
 
       if(paused == true){
         drawPaused();
@@ -238,16 +323,17 @@
         dy = dyLast;
         paused = false;
         pausePressed = false;
+        clickX = 0;
+        clickY = 0;
       } else if(pausePressed){
         paused = true;
         dxLast = dx;
         dyLast = dy;
         dx = 0;
         dy = 0;
-        console.log(dxLast);
-        console.log(dyLast);
-        console.log(pausePressed);
         pausePressed = false;
+        clickX = 0;
+        clickY = 0;
       }
 
       x += dx;
@@ -283,9 +369,15 @@
 
       if(rightPressed && paddleX < canvas.width - paddleWidth) {
         paddleX += 8;
+        clickX = 0;
+        clickY = 0;
+        rightPressed = false;
       }
       else if(leftPressed && paddleX > 0) {
         paddleX -= 8;
+        clickX = 0;
+        clickY = 0;
+        leftPressed = false;
       }
 
       requestAnimationFrame(draw);
@@ -321,6 +413,23 @@
       if(relativeX > 0 && relativeX < canvas.width) {
         paddleX = relativeX - paddleWidth/2;
       }
+    }
+
+    canvas2.addEventListener("click", onClick, false);
+
+    function onClick(e) {
+      var element = canvas2;
+      var offsetX = 0, offsetY = 0;
+
+      if(element.offsetParent){
+        do{
+          offsetX += element.offsetLeft;
+          offsetY += element.offsetTop;
+        } while ((element = element.offsetParent));
+      }
+
+      clickX = e.pageX - offsetX;
+      clickY = e.pageY - offsetY;
     }
 
     draw();
